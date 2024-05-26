@@ -1,12 +1,12 @@
 import cv2
 import mediapipe as mp
 import numpy as np
+
+
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
 
-cap = cv2.VideoCapture(0)
-
-
+# Function to calculate the angle
 def calculate_angle(a, b, c):
     a = np.array(a)  # First
     b = np.array(b)  # Mid
@@ -20,63 +20,87 @@ def calculate_angle(a, b, c):
 
     return angle
 
+# Function to analize the source (stream or video)
+def analyze_video(source):
+    cap = cv2.VideoCapture(source)
 
-# Setup mediapipe instance
-with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
-    angle = 0
-    while cap.isOpened():
-        ret, frame = cap.read()
+    if not cap.isOpened():
+        print(f"Errore nell'apertura del file video o della webcam: {source}")
+        return
 
-        # Recolor image to RGB
-        image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        image.flags.writeable = False
+    with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
+        angle = 180
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                print("Fine del flusso video o errore nella ricezione del frame.")
+                break
 
-        # Make detection
-        results = pose.process(image)
+            # Recolor image to RGB
+            image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            image.flags.writeable = False
 
-        # Recolor back to BGR
-        image.flags.writeable = True
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            # Make detection
+            results = pose.process(image)
 
-        # Extract landmarks
-        try:
-            landmarks = results.pose_landmarks.landmark
+            # Recolor back to BGR
+            image.flags.writeable = True
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-            # Get coordinates
-            shoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
-                        landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
-            elbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,
-                     landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
-            wrist = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,
-                     landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
+            # Extract landmarks
+            try:
+                landmarks = results.pose_landmarks.landmark
 
-            # Calculate angle
-            angle = calculate_angle(shoulder, elbow, wrist)
+                # Get coordinates
+                shoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
+                            landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+                elbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,
+                         landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+                wrist = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,
+                         landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
 
-            # Visualize angle
-            # cv2.putText(image, str(int(angle)),
-            #             tuple(np.multiply(elbow, [640, 480]).astype(int)),
-            #            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA
-            #            )
-        except:
-            pass
-        # Setup status box with angle
-        cv2.rectangle(image, (0, 0), (225, 73), (245, 117, 16), -1)
-        cv2.putText(image, f"{str(int(angle))}",
-                    (50, 60),
-                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+                # Calculate angle
+                angle_revealed = calculate_angle(shoulder, elbow, wrist)
+                if angle_revealed < angle:
+                    angle = angle_revealed
 
-        # Render detections
-        mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
-                                  mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=2),
-                                  mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
-                                  )
+            except:
+                print("An error occurred while processing the frame and calculating the angle.")
 
-        cv2.imshow('Angle Reveal', image)
+            # Setup status box with angle
+            cv2.rectangle(image, (0, 0), (225, 73), (245, 117, 16), -1)
+            cv2.putText(image, f"{str(int(angle))}",
+                        (50, 60),
+                        cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
 
-        if cv2.waitKey(10) & 0xFF == ord('q'):
-            print("ANGLE FOUND (grade): ", angle)
-            break
+            # Render detections
+            mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
+                                      mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=2),
+                                      mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
+                                      )
 
-    cap.release()
-    cv2.destroyAllWindows()
+            # Display the angle on the video (webcam or file)
+            cv2.imshow('Angle Reveal', image)
+
+            if cv2.waitKey(10) & 0xFF == ord('q'):
+                break
+
+        cap.release()
+        cv2.destroyAllWindows()
+
+        # Return the angle found during the video analysis
+        result = f"ANGLE FOUND (grade): {str(int(angle))}"
+        return result
+
+
+if __name__ == "__main__":
+    # Ask the user if he wants to use the webcam or a video file
+    source_choice = input("Vuoi utilizzare la webcam o un file video? (webcam/file): ").strip().lower()
+    if source_choice == 'webcam':
+        source = 0
+    else:
+        source = input("Inserisci il percorso del file video: ").strip()
+
+    print(analyze_video(source))
+
+
