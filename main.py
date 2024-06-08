@@ -4,7 +4,7 @@ from motion_analysis.get_angles.get_shoulder_hip_knee_ankles_angles import get_s
 from motion_analysis.get_angles.get_elbow_shoulder_hip_knee_angles import get_elbow_shoulder_hip_knee_angles
 from motion_analysis.get_angles.get_knee_ankle_foot_angle import get_knee_ankle_foot_angle
 from motion_analysis.get_angles.get_elbow_shoulder90_hip_knee_angles import get_elbow_shoulder90_hip_knee_angles
-from motion_analysis.get_angles.get_elbow_wrist_index_angle import get_elbow_wrist_index_angle
+from motion_analysis.get_angles.get_elbow_wrist_pinky_angle import get_elbow_wrist_pinky_angle
 from motion_analysis.utils.videos import convert_video_to_whatsapp_compatibility
 from motion_analysis.get_angles.get_elbow_shoulder_hip_knee_reverse_angles \
     import get_elbow_shoulder_hip_knee_reverse_angles
@@ -59,7 +59,7 @@ def main():
     print(result06)
     convert_video_to_whatsapp_compatibility(source06[0:-4] + postfix_analyzed)
 
-    result07 = get_elbow_wrist_index_angle(source07)
+    result07 = get_elbow_wrist_pinky_angle(source07)
     print(result07)
     convert_video_to_whatsapp_compatibility(source07[0:-4] + postfix_analyzed)
 
