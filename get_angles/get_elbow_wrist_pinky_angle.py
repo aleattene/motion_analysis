@@ -66,6 +66,7 @@ def get_elbow_wrist_pinky_angle(source):
                 cv2.line(image, tuple(np.multiply(wrist, [image.shape[1], image.shape[0]]).astype(int)),
                          tuple(np.multiply(pinky, [image.shape[1], image.shape[0]]).astype(int)),
                          (0, 255, 0), 2)
+
                 cv2.circle(image, tuple(np.multiply(elbow, [image.shape[1], image.shape[0]]).astype(int)), 5,
                            (0, 0, 255), -1)
                 cv2.circle(image, tuple(np.multiply(wrist, [image.shape[1], image.shape[0]]).astype(int)), 5,
