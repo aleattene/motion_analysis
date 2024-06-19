@@ -10,7 +10,7 @@ from motion_analysis.get_angles.get_elbow_shoulder_hip_knee_reverse_angles \
     import get_elbow_shoulder_hip_knee_reverse_angles
 from motion_analysis.get_angles.get_elbow_shoulder_hip_knee_double_angles \
     import get_elbow_shoulder_hip_knee_double_angles
-from motion_analysis.get_angles.get_body_rotation_angle import get_right_arm_rotation_angle
+# from motion_analysis.get_angles.get_body_rotation_angle import get_right_arm_rotation_angle
 
 
 def main():
