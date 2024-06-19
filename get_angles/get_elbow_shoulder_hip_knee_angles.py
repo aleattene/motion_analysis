@@ -19,9 +19,9 @@ def get_elbow_shoulder_hip_knee_angles(source):
         return
 
     # Define the codec and create VideoWriter object
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec for MP4
-    output_file = os.path.splitext(source)[0] + '_analyzed.avi'
-    out = cv2.VideoWriter(output_file, fourcc, 20.0, (int(cap.get(3)), int(cap.get(4))))
+    # fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec for MP4
+    # output_file = os.path.splitext(source)[0] + '_analyzed.avi'
+    # out = cv2.VideoWriter(output_file, fourcc, 20.0, (int(cap.get(3)), int(cap.get(4))))
 
     # Initialize variable to store the angle offset
     angle_offset_one = None
@@ -130,7 +130,7 @@ def get_elbow_shoulder_hip_knee_angles(source):
                         cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
 
             # Write the frame into the file
-            out.write(image)
+            # out.write(image)
 
             # Display the angle on the video (webcam or file)
             cv2.imshow('Angle Reveal', image)
@@ -139,7 +139,7 @@ def get_elbow_shoulder_hip_knee_angles(source):
                 break
 
         cap.release()
-        out.release()
+        # out.release()
         cv2.destroyAllWindows()
 
         # Return the angle found during the video analysis
